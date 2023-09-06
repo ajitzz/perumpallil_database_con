@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1069616829571",
+    "project_id": "perumpallil-31-aug",
+    "storage_bucket": "perumpallil-31-aug.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069616829571:android:9c1310dcc05630752377b6",
+        "android_client_info": {
+          "package_name": "com.example.perumpallil_augg"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1069616829571-vu3ghqflj2qgu89r22jt6lsd2btvs2ln.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC2BT8OiUr7LMWx2YXkY1j3m84WokTvB8A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1069616829571-vu3ghqflj2qgu89r22jt6lsd2btvs2ln.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
