@@ -113,22 +113,16 @@ class AuthProvider extends ChangeNotifier {
   void saveUserDataToFirebase({
     required BuildContext context,
     required UserModel userModel,
-    // required File profilePic,
     required Function onSuccess,
   }) async {
     _isLoading = true;
     notifyListeners();
     try {
-      // uploading image to firebase storage.
-      // await storeFileToStorage("profilePic/$_uid", profilePic).then((value) {
-      //   userModel.profilePic = value;
-      //   userModel.createdAt = DateTime.now().millisecondsSinceEpoch.toString();
-      //   userModel.phoneNumber = _firebaseAuth.currentUser!.phoneNumber!;
-      //   userModel.uid = _firebaseAuth.currentUser!.phoneNumber!;
-      // });
+      userModel.createdAt = DateTime.now().millisecondsSinceEpoch.toString();
+      userModel.phoneNumber = _firebaseAuth.currentUser!.phoneNumber!;
+      userModel.uid = _firebaseAuth.currentUser!.phoneNumber!;
       _userModel = userModel;
 
-      // uploading to database
       await _firebaseFirestore
           .collection("users")
           .doc(_uid)
@@ -164,7 +158,6 @@ class AuthProvider extends ChangeNotifier {
         createdAt: snapshot['createdAt'],
         bio: snapshot['bio'],
         uid: snapshot['uid'],
-        // profilePic: snapshot['profilePic'],
         phoneNumber: _firebaseAuth.currentUser!.phoneNumber ?? '',
       );
       _uid = userModel.uid;
@@ -193,46 +186,4 @@ class AuthProvider extends ChangeNotifier {
     notifyListeners();
     s.clear();
   }
-
-//  Widget buildCustomerDetailsWidget() {
-//   return StreamBuilder<QuerySnapshot>(
-//     stream: _firebaseFirestore.collection('Customers_Details').snapshots(),
-//     builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
-//       if (snapshot.hasData) {
-//         final details = snapshot.data!.docs;
-//         List<Widget> detailWidgets = [];
-
-//         for (var Detail in details) {
-//           final Detail_mobileNO = Detail['MOB1'];
-
-//           if ('+91$Detail_mobileNO'.contains(userModel.phoneNumber)) {
-//             final Detail_pCode = Detail['PCODE'];
-//             final Detail_refNo = Detail['RefNo'];
-//             final Detail_fnNo = Detail['FNNO'];
-//             final Detail_name = Detail['PNAME'];
-//             final Detail_ksDate = Detail['KSdate'];
-//             final Detail_pDate = Detail['PDATE'];
-//             final Detail_mobile = Detail['MOB1'];
-//             final Detail_address1 = Detail['ADD2'];
-//             final Detail_address2 = Detail['ADD3'];
-//             final Detail_close = Detail['Column5'];
-
-//             // Create a widget to display the customer details here.
-//             // Example:
-//             final customerWidget = ListTile(
-//               title: Text(Detail_name),
-//               subtitle: Text(Detail_mobile),
-//             );
-//             detailWidgets.add(customerWidget);
-//           }
-//         }
-
-//         return Column(children: detailWidgets);
-//       } else {
-//         // Handle the case when there's no data available
-//         return CircularProgressIndicator();
-//       }
-//     },
-//   );
-// }
 }

@@ -1,7 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:perumpallil_augg/Backend/provider/auth_provider.dart';
+import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:perumpallil_augg/Backend/provider/auth_provider.dart';
 import 'package:perumpallil_augg/screens/loan/subscription_home_row.dart';
 import 'package:perumpallil_augg/models/payment_date_amount.dart';
 
@@ -14,126 +15,56 @@ class LoanScreen extends StatefulWidget {
 }
 
 class _LoanScreenState extends State<LoanScreen> {
-  String? detailName;
-
-  int? detailMobile;
-
-  int? detailPCode;
-  int? detailRefNo;
-
-  String? detailFnNo;
-  String? detailKsDate;
-  String? detailPDate;
-  String? detailAddress1;
-  String? detailAddress2;
-  String? detailClose;
-
-  //snapshot_payments
-  String? paymentfdate;
-  int? paymentHCODE;
-  int? paymentCREDIT;
-  int? paymentDEBIT;
-  String? paymentPURP;
-  String? paymentFN_NUM;
-  int? paymentSNO;
-  int? paymentPCODE;
-  int? paymentPAY;
-
   @override
   void initState() {
     super.initState();
-    Provider.of<AuthProvider>(context, listen: false).getDataFromFirestore();
-    CustomerDetailsStream();
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      CustomerDetailsStream();
+      context.read<AuthProvider>().getDataFromFirestore();
+    });
   }
 
   final FirebaseFirestore _firebaseFirestore = FirebaseFirestore.instance;
 
   Future<void> CustomerDetailsStream() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    AuthProvider ap = Provider.of<AuthProvider>(context, listen: false);
 
-    try {
-      final snapshot_details =
-          await _firebaseFirestore.collection('Customers_Details').get();
-      final snapshot_payments =
-          await _firebaseFirestore.collection('Customers_payments').get();
+    print(ap.userModel.phoneNumber);
+    print(ap.userModel.name);
+    print('User Model: ${ap.userModel}');
 
-      if (snapshot_details.docs.isNotEmpty) {
-        final detail = snapshot_details.docs[0].data();
-        final detailMobile = detail['MOB1'] as int;
-        print('$detailMobile');
+    // Check if phoneNumber is valid
+    if (ap.userModel.phoneNumber.length >= 4) {
+      // Remove the country code from the phone number
+      String userPhoneNumber = ap.userModel.phoneNumber.substring(3);
+      print(userPhoneNumber);
 
-        if ('+91$detailMobile'
-            .contains('${authProvider.userModel.phoneNumber}')) {
-          // Cast the values appropriately based on their types in Firestore
-          final detailPCode = detail['PCODE'] as int;
-          final detailRefNo = detail['RefNo'] as int;
-          final detailFnNo = detail['FNNO'] as String;
-          final detailName = detail['PNAME'] as String;
-          final detailKsDate = detail['KSdate'] as String;
-          final detailPDate = detail['PDATE'] as String;
-          final detailAddress1 = detail['ADD2'] as String;
-          final detailAddress2 = detail['ADD3'] as String;
-          final detailClose = detail['Column5'] as String;
-          // final detailMobile = detail['MOB1'] as int;
+      try {
+        final snapshot = await _firebaseFirestore
+            .collection('Customers_Details')
+            .where('MOB1', isEqualTo: userPhoneNumber)
+            .get();
 
-          setState(() {
-            print('${this.detailName = detailName}');
-            print('${this.detailMobile = detailMobile}');
-            print('${this.detailPCode = detailPCode}');
-            print('${this.detailRefNo = detailRefNo}');
-            print('${this.detailFnNo = detailFnNo}');
-            print('${this.detailKsDate = detailKsDate}');
-            print('${this.detailPDate = detailPDate}');
-            print('${this.detailAddress1 = detailAddress1}');
-            print('${this.detailAddress2 = detailAddress2}');
-            print('${this.detailClose = detailClose}');
-          });
+        if (snapshot.docs.isNotEmpty) {
+          var message = snapshot.docs.first;
+          var pCode = message.data()['PCODE'];
+          var refNo = message.data()['RefNo'];
+          var fName = message.data()['FNNO'];
+          var mob1 = message.data()['MOB1'];
+
+          print('PCODE: $pCode, RefNo: $refNo, FNNO: $fName, MOB1: $mob1');
+
+          // Assuming there's a field named 'date' in your document
+          var date = message.data()['date'];
+          print('Date: $date');
         } else {
-          print('MOB1 does not contain phoneNumber in user_Details');
+          print('No document found with the specified phone number');
         }
-      } else {
-        print('No documents snapshots are found, doc is empty');
+      } catch (error) {
+        print('Error in try: $error');
       }
-
-      //user_payments
-      if (snapshot_payments.docs.isNotEmpty) {
-        final payment = snapshot_payments.docs[0].data();
-        final paymentPCODE = payment['PCODE'] as int;
-        print('$detailPCode');
-        print('$paymentPCODE');
-
-        if ('$paymentPCODE'.contains('$detailPCode')) {
-          // Cast the values appropriately based on their types in Firestore
-          final paymentfdate = payment['fdate'] as String;
-          final paymentHCODE = payment['HCODE'] as int;
-          final paymentCREDIT = payment['CREDIT'] as int;
-          final paymentDEBIT = payment['DEBIT'] as int;
-          final paymentPURP = payment['PURP'] as String;
-          final paymentFN_NUM = payment['FN_NUM'] as String;
-          final paymentSNO = payment['SNO'] as int;
-          final paymentPCODE = payment['PCODE'] as int;
-          final paymentPAY = payment['PAY'] as int;
-
-          setState(() {
-            print('${this.paymentfdate = paymentfdate}');
-            print('${this.paymentHCODE = paymentHCODE}');
-            print('${this.paymentCREDIT = paymentCREDIT}');
-            print('${this.paymentDEBIT = paymentDEBIT}');
-            print('${this.paymentPURP = paymentPURP}');
-            print('${this.paymentFN_NUM = paymentFN_NUM}');
-            print('${this.paymentSNO = paymentSNO}');
-            print('${this.paymentPCODE = paymentPCODE}');
-            print('${this.paymentPAY = paymentPAY}');
-          });
-        } else {
-          print('detail code does not contain payment_code in user_payments');
-        }
-      } else {
-        print('No documents snapshots are found, doc is empty');
-      }
-    } catch (error) {
-      // Handle any errors that occur during data retrieval.
-      print('Error: $error');
+    } else {
+      print('Invalid phone number format');
     }
   }
 
@@ -189,6 +120,7 @@ class _LoanScreenState extends State<LoanScreen> {
   }
 
   Widget _buildHeader(BuildContext context) {
+    final ap = context.watch<AuthProvider>();
     return Stack(
       children: [
         Container(
@@ -227,24 +159,13 @@ class _LoanScreenState extends State<LoanScreen> {
                   children: [
                     //USER_NAME
                     Text(
-                      detailName ?? 'Loading...',
+                      ap.userModel.phoneNumber ?? 'Loading...',
                       style: TextStyle(
                         fontWeight: FontWeight.w500,
                         fontSize: 16,
                         color: Color.fromARGB(255, 224, 223, 223),
                       ),
                     ),
-                    // PHONE NUMBER
-                    // Text(
-                    //   detailMobile != null
-                    //       ? detailMobile.toString()
-                    //       : 'Loading...',
-                    //   style: TextStyle(
-                    //     fontWeight: FontWeight.w500,
-                    //     fontSize: 16,
-                    //     color: Color.fromARGB(255, 224, 223, 223),
-                    //   ),
-                    // ),
                     Text(
                       'Good afternoon',
                       style: TextStyle(
